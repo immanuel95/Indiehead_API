@@ -41,6 +41,7 @@ app.post("/register", (req, res) => {
     if (err) {
       throw err;
     }
+    res.send(userdata);
   });
 });
 
