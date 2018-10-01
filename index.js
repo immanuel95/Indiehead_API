@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const app = express();
 const mysql = require("mysql");
 const port = 5000;
-const url = bodyParser.urlencoded({ extended: false });
 
 const conn = mysql.createConnection({
   host: "localhost",
