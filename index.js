@@ -30,14 +30,41 @@ app.get("/login", (req, res) => {
     email: email,
     password: password
   };
-  const sql = `SELECT *  FROM userdata WHERE Email LIKE '%${email}%' AND Password LIKE '%${password}%';`;
+  const sql = `SELECT * FROM userdata WHERE Email LIKE '%${email}%' AND Password LIKE '%${password}%';`;
 
   conn.query(sql, data, (err, result) => {
     if (err) {
       throw err;
     }
     res.send(result);
-    console.log(result);
+  });
+});
+
+app.get("/keepLogin", (req, res) => {
+  var { email } = req.query;
+  var data = {
+    email: email
+  };
+  const sql = `SELECT * FROM userdata WHERE Email LIKE '%${email}%';`;
+
+  conn.query(sql, data, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    res.send(result);
+  });
+});
+
+app.get("/productdetail/:id", (req, res) => {
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                FROM productlist p
+                JOIN artist a ON p.Artist = a.idArtist
+                JOIN category c ON p.Category = c.idCategory
+                WHERE p.idproductlist = ${req.params.id}`;
+
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.send(results);
   });
 });
 
@@ -62,9 +89,10 @@ app.get("/artists", (req, res) => {
 });
 
 app.get("/products", (req, res) => {
-  const sql = `SELECT * FROM productlist p
-                JOIN artist a ON p.Artist = a.idArtist
-                JOIN category c ON  p.Category = c.idCategory`;
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+              FROM productlist p
+              JOIN artist a ON p.Artist = a.idArtist
+              JOIN category c ON p.Category = c.idCategory`;
 
   conn.query(sql, (err, result) => {
     if (err) throw err;
@@ -74,7 +102,8 @@ app.get("/products", (req, res) => {
 });
 
 app.get("/filtertshirt", (req, res) => {
-  const sql = `SELECT p.* FROM productlist p
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
                 JOIN category c ON p.Category = c.idCategory
                 WHERE c.Category LIKE '%T-Shirt%'`;
@@ -86,7 +115,8 @@ app.get("/filtertshirt", (req, res) => {
 });
 
 app.get("/filtercd", (req, res) => {
-  const sql = `SELECT p.* FROM productlist p
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+              FROM productlist p
               JOIN artist a ON p.Artist = a.idArtist
               JOIN category c ON p.Category = c.idCategory
               WHERE c.Category LIKE '%CD%'`;
@@ -98,7 +128,8 @@ app.get("/filtercd", (req, res) => {
 });
 
 app.get("/filtervinyl", (req, res) => {
-  const sql = `SELECT p.* FROM productlist p
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+              FROM productlist p
               JOIN artist a ON p.Artist = a.idArtist
               JOIN category c ON p.Category = c.idCategory
               WHERE c.Category LIKE '%Vinyl%'`;
