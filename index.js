@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   res.send("<h1>Active</h1>");
 });
 
-////////////////////////GET////////////////////////
+// =========================== USER ATHENTICATION ===========================
 
 app.get("/login", (req, res) => {
   var { email, username, password } = req.query;
@@ -55,12 +55,30 @@ app.get("/keepLogin", (req, res) => {
   });
 });
 
-app.get("/productdetail/:id", (req, res) => {
+app.post("/register", (req, res) => {
+  const userdata = {
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password
+  };
+  const sql = `INSERT INTO userdata SET ?`;
+
+  conn.query(sql, userdata, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    res.send(userdata);
+  });
+});
+
+// =========================== PRODUCTS ===========================
+
+app.get("/filterartist/:name", (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
                 JOIN category c ON p.Category = c.idCategory
-                WHERE p.idproductlist = ${req.params.id}`;
+                WHERE a.Artist LIKE '%${req.params.name}%'`;
 
   conn.query(sql, (err, results) => {
     if (err) throw err;
@@ -74,6 +92,19 @@ app.get("/articles", (req, res) => {
   conn.query(sql, (err, results) => {
     if (err) throw err;
 
+    res.send(results);
+  });
+});
+
+app.get("/productdetail/:id", (req, res) => {
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                FROM productlist p
+                JOIN artist a ON p.Artist = a.idArtist
+                JOIN category c ON p.Category = c.idCategory
+                WHERE p.idproductlist = ${req.params.id}`;
+
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
     res.send(results);
   });
 });
@@ -140,22 +171,83 @@ app.get("/filtervinyl", (req, res) => {
   });
 });
 
-////////////////////////POST////////////////////////
+// =========================== CART ===========================
 
-app.post("/register", (req, res) => {
-  const userdata = {
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password
-  };
-  const sql = `INSERT INTO userdata SET ?`;
+app.get("/cart/:username", (req, res) => {
+  const sql = `SELECT c.*, a.Artist as NamaArtist, ct.Category as NamaCategory FROM cart c
+                JOIN artist a ON c.Artist = a.idArtist
+                JOIN category ct ON c.Category = ct.idCategory
+                WHERE c.Username = '${req.params.username}';`;
 
-  conn.query(sql, userdata, (err, result) => {
-    if (err) {
-      throw err;
-    }
-    res.send(userdata);
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
   });
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+app.post("/cart", (req, res) => {
+  const {
+    username,
+    idproductlist,
+    ProductName,
+    Artist,
+    Category,
+    Picture,
+    Price,
+    amount
+  } = req.body;
+
+  const data = {
+    Username: username,
+    idproductlist,
+    ProductName,
+    Artist,
+    Category,
+    Picture,
+    Price,
+    Amount: amount
+  };
+
+  const sql = `SELECT * FROM cart WHERE Username = '${username}' AND idproductlist = ${idproductlist};`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    if (result != "") {
+      const sql1 = `UPDATE cart SET Amount = Amount + ${amount} WHERE idproductlist = ${idproductlist} AND Username = '${username}';`;
+
+      conn.query(sql1, (err1, result1) => {
+        if (err1) throw err1;
+        res.send(result1);
+        console.log("updated");
+      });
+    } else {
+      const sql2 = `INSERT INTO cart SET ?`;
+
+      conn.query(sql2, data, (err2, result2) => {
+        if (err) throw err2;
+        res.send(result2);
+      });
+    }
+  });
+});
+
+app.delete("/cart", (req, res) => {
+  const sql = `DELETE FROM cart WHERE idcart = ${req.query.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT c.*, a.Artist as NamaArtist, ct.Category as NamaCategory FROM cart c
+                  JOIN artist a ON c.Artist = a.idArtist
+                  JOIN category ct ON c.Category = ct.idCategory
+                  WHERE c.Username = '${req.query.username}';`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
