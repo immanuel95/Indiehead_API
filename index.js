@@ -71,7 +71,39 @@ app.post("/register", (req, res) => {
   });
 });
 
+app.put("/useredit/:username", (req, res) => {
+  const { address } = req.body;
+  const data = { address };
+
+  const sql = `UPDATE userdata SET address = '${address}'
+                WHERE username = '${req.params.username}'`;
+
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT address FROM userdata
+                    WHERE username = '${req.params.username}'`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
 // =========================== PRODUCTS ===========================
+
+app.get("/allproducts", (req, res) => {
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                FROM productlist p
+                JOIN artist a ON p.Artist = a.idArtist
+                JOIN category c ON p.Category = c.idCategory ORDER BY RAND() LIMIT 10;`;
+
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
 
 app.get("/filterartist/:name", (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
@@ -82,16 +114,6 @@ app.get("/filterartist/:name", (req, res) => {
 
   conn.query(sql, (err, results) => {
     if (err) throw err;
-    res.send(results);
-  });
-});
-
-app.get("/articles", (req, res) => {
-  const sql = `SELECT * FROM articles`;
-
-  conn.query(sql, (err, results) => {
-    if (err) throw err;
-
     res.send(results);
   });
 });
@@ -514,6 +536,27 @@ app.get("/transaction", (req, res) => {
 });
 
 app.get("/transdetail/:id", (req, res) => {
+  const sql = `SELECT * FROM transaction_detail 
+                WHERE idtransaction = ${req.params.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+app.get("/usertransaction", (req, res) => {
+  const sql = `SELECT * FROM transaction WHERE username = '${
+    req.query.username
+  }'`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+app.get("/usertransdetail/:id", (req, res) => {
   const sql = `SELECT * FROM transaction_detail 
                 WHERE idtransaction = ${req.params.id}`;
 
