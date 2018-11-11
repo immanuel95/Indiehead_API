@@ -201,6 +201,38 @@ app.put("/products/:id", (req, res) => {
   });
 });
 
+app.put("/category/:id", (req, res) => {
+  const { Category } = req.body;
+  const data = { Category };
+
+  const sql = `UPDATE category SET ? WHERE idCategory = ${req.params.id}`;
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM category;`;
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.put("/artist/:id", (req, res) => {
+  const { Artist } = req.body;
+  const data = { Artist };
+
+  const sql = `UPDATE artist SET ? WHERE idArtist = ${req.params.id}`;
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM artist;`;
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
 app.post("/addproduct", (req, res) => {
   const { Picture, ProductName, Artist, Category, Price } = req.body;
   const data = { Picture, ProductName, Artist, Category, Price };
@@ -219,6 +251,104 @@ app.post("/addproduct", (req, res) => {
       if (err1) throw err1;
       res.send(result1);
     });
+  });
+});
+
+app.post("/addcategory", (req, res) => {
+  const { Category } = req.body;
+  const data = { Category };
+
+  const sql = `INSERT INTO category SET ?`;
+
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM category;`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.post("/addartist", (req, res) => {
+  const { Picture, Artist } = req.body;
+  const data = { Picture, Artist };
+
+  const sql = `INSERT INTO artist SET ?`;
+
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM artist;`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.delete("/deleteproduct", (req, res) => {
+  const sql = `DELETE FROM productlist WHERE idproductlist = ${req.query.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                  FROM productlist p
+                  JOIN artist a ON p.Artist = a.idArtist
+                  JOIN category c ON p.Category = c.idCategory`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.delete("/deletecategory", (req, res) => {
+  const sql = `DELETE FROM category WHERE idCategory = ${req.query.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM category`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.delete("/deleteartist", (req, res) => {
+  const sql = `DELETE FROM artist WHERE idArtist = ${req.query.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    const sql1 = `SELECT * FROM artist`;
+
+    conn.query(sql1, (err1, result1) => {
+      if (err1) throw err1;
+      res.send(result1);
+    });
+  });
+});
+
+app.get("/searchproduct", (req, res) => {
+  const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
+                FROM productlist p
+                JOIN artist a ON p.Artist = a.idArtist
+                JOIN category c ON p.Category = c.idCategory
+                WHERE p.ProductName LIKE '%${req.query.productname}%'
+                OR a.Artist LIKE '%${req.query.productname}%'`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
   });
 });
 
@@ -334,17 +464,6 @@ app.post("/checkout", (req, res) => {
 
           conn.query(sql3, (err3, result3) => {
             if (err3) throw err3;
-
-            const sql4 = `SELECT c.*, a.Artist as NamaArtist, ct.Category as NamaCategory FROM cart c
-                          JOIN artist a ON c.Artist = a.idArtist
-                          JOIN category ct ON c.Category = ct.idCategory
-                          WHERE c.Username = '${username}';`;
-
-            conn.query(sql4, (err4, result4) => {
-              if (err4) throw err4;
-
-              res.send(result4);
-            });
           });
         });
       });
@@ -382,6 +501,25 @@ app.post("/buynow", (req, res) => {
         });
       });
     });
+  });
+});
+
+app.get("/transaction", (req, res) => {
+  const sql = `SELECT * FROM transaction`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
+
+app.get("/transdetail/:id", (req, res) => {
+  const sql = `SELECT * FROM transaction_detail 
+                WHERE idtransaction = ${req.params.id}`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result);
   });
 });
 
