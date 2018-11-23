@@ -57,6 +57,7 @@ app.get("/keepLogin", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userdata = {
+    fullname: req.body.fullname,
     username: req.body.username,
     email: req.body.email,
     password: req.body.password
@@ -503,7 +504,7 @@ app.post("/buynow", (req, res) => {
     if (err) throw err;
 
     const sql1 = `SELECT (SELECT MAX(idtransaction) FROM transaction WHERE Username = '${username}') AS idtransaction,
-                  ProductName, Picture, Price, Amount FROM cart WHERE Username = '${username}'`;
+                  ProductName, Picture, Price FROM productlist WHERE Username = '${username}'`;
 
     conn.query(sql1, (err1, result1) => {
       if (err1) throw err1;
