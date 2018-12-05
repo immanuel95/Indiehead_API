@@ -1,15 +1,15 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
-const mysql = require("mysql2");
+const mysql = require('mysql2');
 const port = 5000;
 
 const conn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Immanuel^95",
-  database: "indiehead",
+  host: 'localhost',
+  user: 'root',
+  password: 'Immanuel^95',
+  database: 'indiehead',
   port: 3306
 });
 
@@ -17,20 +17,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("<h1>Active</h1>");
+app.get('/', (req, res) => {
+  res.send('<h1>Active</h1>');
 });
 
 // =========================== USER ATHENTICATION ===========================
 
-app.get("/login", (req, res) => {
+app.get('/login', (req, res) => {
   var { email, username, password } = req.query;
   var data = {
     username: username,
     email: email,
     password: password
   };
-  const sql = `SELECT * FROM userdata WHERE Email LIKE '%${email}%' AND Password LIKE '%${password}%';`;
+  const sql = `SELECT * FROM userdata WHERE Email = '${email}' AND Password = '${password}';`;
 
   conn.query(sql, data, (err, result) => {
     if (err) {
@@ -40,7 +40,7 @@ app.get("/login", (req, res) => {
   });
 });
 
-app.get("/keepLogin", (req, res) => {
+app.get('/keepLogin', (req, res) => {
   var { email } = req.query;
   var data = {
     email: email
@@ -55,7 +55,7 @@ app.get("/keepLogin", (req, res) => {
   });
 });
 
-app.post("/register", (req, res) => {
+app.post('/register', (req, res) => {
   const userdata = {
     fullname: req.body.fullname,
     username: req.body.username,
@@ -72,7 +72,7 @@ app.post("/register", (req, res) => {
   });
 });
 
-app.put("/useredit/:username", (req, res) => {
+app.put('/useredit/:username', (req, res) => {
   const { address } = req.body;
   const data = { address };
 
@@ -82,8 +82,7 @@ app.put("/useredit/:username", (req, res) => {
   conn.query(sql, data, (err, result) => {
     if (err) throw err;
 
-    const sql1 = `SELECT address FROM userdata
-                    WHERE username = '${req.params.username}'`;
+    const sql1 = `SELECT * FROM userdata WHERE username LIKE '%${req.params.username}%'`;
 
     conn.query(sql1, (err1, result1) => {
       if (err1) throw err1;
@@ -94,7 +93,7 @@ app.put("/useredit/:username", (req, res) => {
 
 // =========================== PRODUCTS ===========================
 
-app.get("/allproducts", (req, res) => {
+app.get('/allproducts', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
@@ -106,7 +105,7 @@ app.get("/allproducts", (req, res) => {
   });
 });
 
-app.get("/filterartist/:name", (req, res) => {
+app.get('/filterartist/:name', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
@@ -119,7 +118,7 @@ app.get("/filterartist/:name", (req, res) => {
   });
 });
 
-app.get("/productdetail/:id", (req, res) => {
+app.get('/productdetail/:id', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
@@ -132,7 +131,7 @@ app.get("/productdetail/:id", (req, res) => {
   });
 });
 
-app.get("/artists", (req, res) => {
+app.get('/artists', (req, res) => {
   const sql = `SELECT * FROM artist;`;
 
   conn.query(sql, (err, results) => {
@@ -142,7 +141,7 @@ app.get("/artists", (req, res) => {
   });
 });
 
-app.get("/category", (req, res) => {
+app.get('/category', (req, res) => {
   const sql = `SELECT * FROM category;`;
 
   conn.query(sql, (err, results) => {
@@ -152,7 +151,7 @@ app.get("/category", (req, res) => {
   });
 });
 
-app.get("/products", (req, res) => {
+app.get('/products', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
               FROM productlist p
               JOIN artist a ON p.Artist = a.idArtist
@@ -165,7 +164,7 @@ app.get("/products", (req, res) => {
   });
 });
 
-app.get("/filtertshirt", (req, res) => {
+app.get('/filtertshirt', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
@@ -178,7 +177,7 @@ app.get("/filtertshirt", (req, res) => {
   });
 });
 
-app.get("/filtercd", (req, res) => {
+app.get('/filtercd', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
               FROM productlist p
               JOIN artist a ON p.Artist = a.idArtist
@@ -191,7 +190,7 @@ app.get("/filtercd", (req, res) => {
   });
 });
 
-app.get("/filtervinyl", (req, res) => {
+app.get('/filtervinyl', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
               FROM productlist p
               JOIN artist a ON p.Artist = a.idArtist
@@ -204,7 +203,7 @@ app.get("/filtervinyl", (req, res) => {
   });
 });
 
-app.put("/products/:id", (req, res) => {
+app.put('/products/:id', (req, res) => {
   const { Picture, Artist, ProductName, Category, Price } = req.body;
   const data = { Picture, Artist, ProductName, Category, Price };
 
@@ -224,7 +223,7 @@ app.put("/products/:id", (req, res) => {
   });
 });
 
-app.put("/category/:id", (req, res) => {
+app.put('/category/:id', (req, res) => {
   const { Category } = req.body;
   const data = { Category };
 
@@ -240,7 +239,7 @@ app.put("/category/:id", (req, res) => {
   });
 });
 
-app.put("/artist/:id", (req, res) => {
+app.put('/artist/:id', (req, res) => {
   const { Artist } = req.body;
   const data = { Artist };
 
@@ -256,7 +255,7 @@ app.put("/artist/:id", (req, res) => {
   });
 });
 
-app.post("/addproduct", (req, res) => {
+app.post('/addproduct', (req, res) => {
   const { Picture, ProductName, Artist, Category, Price } = req.body;
   const data = { Picture, ProductName, Artist, Category, Price };
 
@@ -277,7 +276,7 @@ app.post("/addproduct", (req, res) => {
   });
 });
 
-app.post("/addcategory", (req, res) => {
+app.post('/addcategory', (req, res) => {
   const { Category } = req.body;
   const data = { Category };
 
@@ -295,7 +294,7 @@ app.post("/addcategory", (req, res) => {
   });
 });
 
-app.post("/addartist", (req, res) => {
+app.post('/addartist', (req, res) => {
   const { Picture, Artist } = req.body;
   const data = { Picture, Artist };
 
@@ -313,7 +312,7 @@ app.post("/addartist", (req, res) => {
   });
 });
 
-app.delete("/deleteproduct", (req, res) => {
+app.delete('/deleteproduct', (req, res) => {
   const sql = `DELETE FROM productlist WHERE idproductlist = ${req.query.id}`;
 
   conn.query(sql, (err, result) => {
@@ -331,7 +330,7 @@ app.delete("/deleteproduct", (req, res) => {
   });
 });
 
-app.delete("/deletecategory", (req, res) => {
+app.delete('/deletecategory', (req, res) => {
   const sql = `DELETE FROM category WHERE idCategory = ${req.query.id}`;
 
   conn.query(sql, (err, result) => {
@@ -346,7 +345,7 @@ app.delete("/deletecategory", (req, res) => {
   });
 });
 
-app.delete("/deleteartist", (req, res) => {
+app.delete('/deleteartist', (req, res) => {
   const sql = `DELETE FROM artist WHERE idArtist = ${req.query.id}`;
 
   conn.query(sql, (err, result) => {
@@ -361,7 +360,7 @@ app.delete("/deleteartist", (req, res) => {
   });
 });
 
-app.get("/searchproduct", (req, res) => {
+app.get('/searchproduct', (req, res) => {
   const sql = `SELECT p.*, a.Artist as NamaArtist, c.Category as NamaCategory 
                 FROM productlist p
                 JOIN artist a ON p.Artist = a.idArtist
@@ -377,7 +376,7 @@ app.get("/searchproduct", (req, res) => {
 
 // =========================== CART ===========================
 
-app.get("/cart/:username", (req, res) => {
+app.get('/cart/:username', (req, res) => {
   const sql = `SELECT c.*, a.Artist as NamaArtist, ct.Category as NamaCategory FROM cart c
                 JOIN artist a ON c.Artist = a.idArtist
                 JOIN category ct ON c.Category = ct.idCategory
@@ -389,17 +388,8 @@ app.get("/cart/:username", (req, res) => {
   });
 });
 
-app.post("/cart", (req, res) => {
-  const {
-    username,
-    idproductlist,
-    ProductName,
-    Artist,
-    Category,
-    Picture,
-    Price,
-    amount
-  } = req.body;
+app.post('/cart', (req, res) => {
+  const { username, idproductlist, ProductName, Artist, Category, Picture, Price, amount } = req.body;
 
   const data = {
     Username: username,
@@ -417,7 +407,7 @@ app.post("/cart", (req, res) => {
   conn.query(sql, (err, result) => {
     if (err) throw err;
 
-    if (result != "") {
+    if (result != '') {
       const sql1 = `UPDATE cart SET Amount = Amount + ${amount} WHERE idproductlist = ${idproductlist} AND Username = '${username}';`;
 
       conn.query(sql1, (err1, result1) => {
@@ -435,7 +425,7 @@ app.post("/cart", (req, res) => {
   });
 });
 
-app.delete("/cart", (req, res) => {
+app.delete('/cart', (req, res) => {
   const sql = `DELETE FROM cart WHERE idcart = ${req.query.id}`;
 
   conn.query(sql, (err, result) => {
@@ -455,7 +445,7 @@ app.delete("/cart", (req, res) => {
 
 // =========================== TRANSACTIONS ===========================
 
-app.post("/checkout", (req, res) => {
+app.post('/checkout', (req, res) => {
   const { username, totalPrice } = req.body;
   const data = { Username: username, TotalPrice: totalPrice };
 
@@ -473,13 +463,7 @@ app.post("/checkout", (req, res) => {
       const sql2 = `INSERT INTO transaction_detail (idtransaction, ProductName, Price, Picture, Amount) VALUES ?`;
       var values = [];
       result1.map(data => {
-        values.push([
-          data.idtransaction,
-          data.ProductName,
-          data.Price,
-          data.Picture,
-          data.Amount
-        ]);
+        values.push([data.idtransaction, data.ProductName, data.Price, data.Picture, data.Amount]);
         conn.query(sql2, [values], (err2, result2) => {
           if (err2) throw err2;
 
@@ -494,7 +478,7 @@ app.post("/checkout", (req, res) => {
   });
 });
 
-app.post("/buynow", (req, res) => {
+app.post('/buynow', (req, res) => {
   const { username, totalPrice } = req.body;
   const data = { Username: username, TotalPrice: totalPrice };
 
@@ -512,13 +496,7 @@ app.post("/buynow", (req, res) => {
       const sql2 = `INSERT INTO transaction_detail (idtransaction, ProductName, Price, Picture, Amount) VALUES ?`;
       var values = [];
       result1.map(data => {
-        values.push([
-          data.idtransaction,
-          data.ProductName,
-          data.Price,
-          data.Picture,
-          data.Amount
-        ]);
+        values.push([data.idtransaction, data.ProductName, data.Price, data.Picture, data.Amount]);
         conn.query(sql2, [values], (err2, result2) => {
           if (err2) throw err2;
         });
@@ -527,7 +505,7 @@ app.post("/buynow", (req, res) => {
   });
 });
 
-app.get("/transaction", (req, res) => {
+app.get('/transaction', (req, res) => {
   const sql = `SELECT * FROM transaction`;
 
   conn.query(sql, (err, result) => {
@@ -536,7 +514,7 @@ app.get("/transaction", (req, res) => {
   });
 });
 
-app.get("/transdetail/:id", (req, res) => {
+app.get('/transdetail/:id', (req, res) => {
   const sql = `SELECT * FROM transaction_detail 
                 WHERE idtransaction = ${req.params.id}`;
 
@@ -546,10 +524,8 @@ app.get("/transdetail/:id", (req, res) => {
   });
 });
 
-app.get("/usertransaction", (req, res) => {
-  const sql = `SELECT * FROM transaction WHERE username = '${
-    req.query.username
-  }'`;
+app.get('/usertransaction', (req, res) => {
+  const sql = `SELECT * FROM transaction WHERE username = '${req.query.username}'`;
 
   conn.query(sql, (err, result) => {
     if (err) throw err;
@@ -557,7 +533,7 @@ app.get("/usertransaction", (req, res) => {
   });
 });
 
-app.get("/usertransdetail/:id", (req, res) => {
+app.get('/usertransdetail/:id', (req, res) => {
   const sql = `SELECT * FROM transaction_detail 
                 WHERE idtransaction = ${req.params.id}`;
 
