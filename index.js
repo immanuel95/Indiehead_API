@@ -478,6 +478,18 @@ app.post('/checkout', (req, res) => {
   });
 });
 
+app.get('/total/:username', (req, res) => {
+  const sql = `SELECT Username, sum(Price) as Total
+                FROM cart WHERE Username = '${req.params.username}'
+                GROUP BY Username;`;
+
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+
+    res.send(result);
+  });
+});
+
 app.post('/buynow', (req, res) => {
   const { username, totalPrice } = req.body;
   const data = { Username: username, TotalPrice: totalPrice };
